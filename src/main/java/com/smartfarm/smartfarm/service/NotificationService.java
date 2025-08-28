@@ -1,43 +1,56 @@
 package com.smartfarm.smartfarm.service;
 
 import com.smartfarm.smartfarm.entity.Notification;
+import com.smartfarm.smartfarm.entity.Recommendation;
+import com.smartfarm.smartfarm.model.SeverityLevel;
 import com.smartfarm.smartfarm.repositories.NotificationRepo;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class NotificationService {
 
-    @Autowired
-    private NotificationRepo notificationRepo;
+    private final NotificationRepo notificationRepo;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    public Notification createNotification(Notification notification) {
+    /**
+     * Create a notification for HIGH severity recommendations.
+     * Also push it via WebSocket.
+     */
+    public Notification createNotification(Recommendation recommendation, String cropName, String location) {
+        if (recommendation.getSeverity() != SeverityLevel.HIGH) return null;
+
+        Notification notification = new Notification();
+        notification.setMessage(recommendation.getMessage());
+        notification.setCropName(cropName);
+        notification.setLocation(location);
+        notification.setSent(false);
         notification.setCreatedAt(LocalDateTime.now());
-        return notificationRepo.save(notification);
+
+        notificationRepo.save(notification);
+
+        // Push via WebSocket
+        try {
+            messagingTemplate.convertAndSend("/topic/notifications", notification);
+            System.out.println("✅ Notification sent via WebSocket: " + notification.getMessage());
+        } catch (Exception e) {
+            System.err.println("❌ WebSocket push failed: " + e.getMessage());
+        }
+
+        return notification;
     }
 
-    public Notification getById(Long id) {
-        return notificationRepo.findById(id).orElseThrow(() -> new RuntimeException("Notification not found"));
+    public void markNotificationsAsSent(List<Notification> notifications) {
+        notifications.forEach(n -> n.setSent(true));
+        notificationRepo.saveAll(notifications);
     }
 
-    public List<Notification> getAllNotifications() {
-        return notificationRepo.findAll();
-    }
-
-    public Notification updateNotification(Long id, Notification updated) {
-        Notification note = notificationRepo.findById(id).orElseThrow(() -> new RuntimeException("Notification not found"));
-
-        note.setTitle(updated.getTitle());
-        note.setMessage(updated.getMessage());
-        note.setType(updated.getType());
-        note.setCreatedAt(updated.getCreatedAt());
-        return notificationRepo.save(note);
-    }
-
-    public void deleteNotification(Long id) {
-        notificationRepo.deleteById(id);
+    public List<Notification> getUnsentNotifications() {
+        return notificationRepo.findBySentFalse();
     }
 }

@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -21,7 +20,8 @@ public class WeatherDataService {
     }
 
     public WeatherData getById(Long id){
-        return weatherDataRepo.findById(id).orElseThrow(() -> new RuntimeException("Weather data not found"));
+        return weatherDataRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Weather data not found"));
     }
 
     public List<WeatherData> getByLocation(String location){
@@ -34,13 +34,21 @@ public class WeatherDataService {
 
     @Scheduled(cron = "0 0 6 * * *") // every day at 6 AM
     public void autoFetchWeatherData() {
-        List<String> locations = Arrays.asList("Delhi", "Jaipur", "Indore","Bhopal");
 
-        for (String location : locations) {
-            WeatherData data = weatherService.fetchWeatherData(location);
+        List<LocationPoint> locations = List.of(
+                new LocationPoint("Delhi", 28.6139, 77.2090),
+                new LocationPoint("Jaipur", 26.9124, 75.7873),
+                new LocationPoint("Indore", 22.7196, 75.8577),
+                new LocationPoint("Bhopal", 23.2599, 77.4126)
+        );
+
+        for (LocationPoint loc : locations) {
+            WeatherData data =
+                    weatherService.fetchWeatherData(loc.getLat(), loc.getLon());
+
             if (data != null) {
                 weatherDataRepo.save(data);
-                System.out.println("Saved weather for: " + location);
+                System.out.println("Saved weather for: " + loc.getName());
             }
         }
     }

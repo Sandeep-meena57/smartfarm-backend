@@ -1,32 +1,41 @@
 package com.smartfarm.smartfarm.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
+@Table(name = "crops")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Crop {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String name;               // Crop name
+    private String category;           // Cereal, Vegetable, Fruit, etc.
 
-    private String season;
+    private Float idealTempMin;        // Min temperature in °C
+    private Float idealTempMax;        // Max temperature in °C
 
-    private  String soilType;
+    private Float idealHumidityMin;    // Min humidity in %
+    private Float idealHumidityMax;    // Max humidity in %
 
-    private String waterRequirement;
+    private String soilType;           // Loamy, Clay, Sandy, etc.
+    private String waterRequirement;   // Low, Medium, High
 
-    private String description;
+    private String plantingSeason;     // e.g., Oct-Jan
+    private String harvestSeason;      // e.g., Mar-May
 
+    private Integer growthDurationDays;
 
+    private Boolean popular;           // true if commonly recommended
+
+    @Column(length = 1000)
+    private String description;        // Optional notes
+
+    private String imageUrl;           // Optional for frontend
 }

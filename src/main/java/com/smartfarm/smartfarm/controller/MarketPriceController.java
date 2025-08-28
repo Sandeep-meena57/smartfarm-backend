@@ -14,6 +14,7 @@ import java.util.List;
 @Tag(name = "Market Prices", description = "APIs for managing crop market prices")
 @RestController
 @RequestMapping("/api/market-prices")
+@CrossOrigin(origins = "http://localhost:5173")
 public class MarketPriceController {
 
     @Autowired

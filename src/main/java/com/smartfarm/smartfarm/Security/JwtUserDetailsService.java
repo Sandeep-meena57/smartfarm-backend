@@ -18,7 +18,7 @@ public class JwtUserDetailsService implements UserDetailsService {
                 .map(user -> org.springframework.security.core.userdetails.User.builder()
                         .username(user.getEmail())
                         .password(user.getPassword())
-                        .roles(user.getRole().name()) // Must be FARMER or ADMIN
+//                        .roles(user.getRole().name()) // Must be FARMER or ADMIN
                         .build())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }

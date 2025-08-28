@@ -35,10 +35,10 @@ public class UserService {
         User user = userRepo.findById(id).orElseThrow(() -> new RuntimeException("User not found "));
         user.setName(updatedUser.getName());
         user.setEmail(updatedUser.getEmail());
-        user.setRole(updatedUser.getRole());
-        user.setPassword(updatedUser.getPassword());
-        user.setLocation(updatedUser.getLocation());
-        user.setSoilType(updatedUser.getSoilType());
+//        user.setRole(updatedUser.getRole());
+//        user.setPassword(updatedUser.getPassword());
+//        user.setLocation(updatedUser.getLocation());
+//        user.setSoilType(updatedUser.getSoilType());
         return userRepo.save(user);
     }
 

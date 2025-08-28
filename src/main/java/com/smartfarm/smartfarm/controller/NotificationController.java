@@ -1,55 +1,38 @@
 package com.smartfarm.smartfarm.controller;
 
 import com.smartfarm.smartfarm.entity.Notification;
+import com.smartfarm.smartfarm.entity.Recommendation;
+import com.smartfarm.smartfarm.model.RecommendationType;
+import com.smartfarm.smartfarm.model.SeverityLevel;
 import com.smartfarm.smartfarm.service.NotificationService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Notifications", description = "Manage general announcements and alerts for farmers")
 @RestController
 @RequestMapping("/api/notifications")
+@RequiredArgsConstructor
 public class NotificationController {
 
-    @Autowired
-    private NotificationService notificationService;
+    private final NotificationService notificationService;
 
-    @Operation(summary = "Create a new notification (Admin only)")
-    @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Notification> create(@RequestBody Notification notification) {
-        return ResponseEntity.ok(notificationService.createNotification(notification));
-    }
-
-    @Operation(summary = "Get all notifications")
     @GetMapping
-    public ResponseEntity<List<Notification>> getAll() {
-        return ResponseEntity.ok(notificationService.getAllNotifications());
+    public List<Notification> getAllNotifications() {
+        return notificationService.getUnsentNotifications();
     }
 
-    @Operation(summary = "Get a notification by ID")
-    @GetMapping("/{id}")
-    public ResponseEntity<Notification> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(notificationService.getById(id));
-    }
-
-    @Operation(summary = "Update a notification by ID (Admin only)")
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Notification> update(@PathVariable Long id, @RequestBody Notification notification) {
-        return ResponseEntity.ok(notificationService.updateNotification(id, notification));
-    }
-
-    @Operation(summary = "Delete a notification by ID (Admin only)")
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> delete(@PathVariable Long id) {
-        notificationService.deleteNotification(id);
-        return ResponseEntity.ok("Notification deleted");
+    @PostMapping("/test")
+    public Notification createTestNotification(
+            @RequestParam String cropName,
+            @RequestParam String location,
+            @RequestParam String message
+    ) {
+        Recommendation recommendation = new Recommendation(
+                RecommendationType.WEATHER_ALERT,
+                message,
+                SeverityLevel.HIGH
+        );
+        return notificationService.createNotification(recommendation, cropName, location);
     }
 }

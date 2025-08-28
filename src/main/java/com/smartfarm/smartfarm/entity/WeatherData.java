@@ -1,19 +1,14 @@
 package com.smartfarm.smartfarm.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
 @Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 public class WeatherData {
 
     @Id
@@ -24,14 +19,13 @@ public class WeatherData {
 
     private double temperature;
 
-    private double humidity;
+    private int humidity;
 
-    private String forecast;
+    @Column(name = "weather_condition")
+    private String condition;
 
-    private Double windSpeed;
+
+    private double windSpeed;
 
     private LocalDate date;
-
-    public WeatherData(Object o, String delhi, double v, double v1, double v2, LocalDate localDate) {
-    }
 }
