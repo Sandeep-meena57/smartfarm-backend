@@ -2,11 +2,18 @@ package com.smartfarm.smartfarm.repositories;
 
 import com.smartfarm.smartfarm.entity.Crop;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-@Repository
-public interface CropRepo extends JpaRepository<Crop,Long> {
 
-    List<Crop> findBySoilTypeAndSeasonAndWaterRequirement(String soilType,String season,String waterRequirement);
+public interface CropRepo extends JpaRepository<Crop, Long> {
+
+    @Query("SELECT c FROM Crop c " +
+            "WHERE LOWER(c.soilType) = LOWER(:soilType) " +
+            "AND LOWER(c.season) = LOWER(:season) " +
+            "AND LOWER(c.waterRequirement) = LOWER(:waterRequirement)")
+    List<Crop> findByConditionsIgnoreCase(@Param("soilType") String soilType,
+                                          @Param("season") String season,
+                                          @Param("waterRequirement") String waterRequirement);
 }

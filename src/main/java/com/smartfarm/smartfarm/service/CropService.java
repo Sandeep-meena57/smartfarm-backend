@@ -6,40 +6,43 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CropService {
+
     @Autowired
     private CropRepo cropRepo;
 
-    public Crop addCrop(Crop crop){
+    public Crop addCrop(Crop crop) {
         return cropRepo.save(crop);
-
     }
 
-    public Crop getCropById(Long id){
-        return cropRepo.findById(id).orElseThrow(()->new RuntimeException("Crop not Found "));
-    }
-
-    public List<Crop> getAllCrops(){
+    public List<Crop> getAllCrops() {
         return cropRepo.findAll();
     }
 
-    public List<Crop> recommendedCrops(String soilType,String season,String waterRequirement){
-        return cropRepo.findBySoilTypeAndSeasonAndWaterRequirement(soilType,season,waterRequirement);
+    public Crop updateCrop(Long id, Crop crop) {
+        Optional<Crop> opt = cropRepo.findById(id);
+        if (opt.isEmpty()) throw new RuntimeException("Crop not found with id " + id);
+        Crop existing = opt.get();
+        existing.setName(crop.getName());
+        existing.setDescription(crop.getDescription());
+        existing.setSeason(crop.getSeason());
+        existing.setSoilType(crop.getSoilType());
+        existing.setWaterRequirement(crop.getWaterRequirement());
+        return cropRepo.save(existing);
     }
 
-    public Crop updateCrop(Long id,Crop updatedCrop){
-        Crop crop = cropRepo.findById(id).orElseThrow(()->new RuntimeException("User Not Found"));
-        crop.setName(updatedCrop.getName());
-        crop.setDescription(updatedCrop.getDescription());
-        crop.setSeason(updatedCrop.getSeason());
-        crop.setSoilType(updatedCrop.getSoilType());
-        return cropRepo.save(crop);
-    }
-
-    public  void deleteCrop(Long id){
+    public void deleteCrop(Long id) {
+        if (!cropRepo.existsById(id)) throw new RuntimeException("Crop not found with id " + id);
         cropRepo.deleteById(id);
     }
 
+    public List<Crop> recommendCrops(String soilType, String season, String waterRequirement) {
+        if (soilType == null || season == null || waterRequirement == null) {
+            return List.of();
+        }
+        return cropRepo.findByConditionsIgnoreCase(soilType, season, waterRequirement);
+    }
 }
