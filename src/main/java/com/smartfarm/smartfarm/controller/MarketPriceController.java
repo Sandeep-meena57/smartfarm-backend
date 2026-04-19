@@ -4,7 +4,7 @@ import com.smartfarm.smartfarm.entity.MarketPrice;
 import com.smartfarm.smartfarm.service.MarketPriceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -14,13 +14,12 @@ import java.util.List;
 @Tag(name = "Market Prices", description = "APIs for managing crop market prices")
 @RestController
 @RequestMapping("/api/market-prices")
-@CrossOrigin(origins = "http://localhost:5173")
+@RequiredArgsConstructor
 public class MarketPriceController {
 
-    @Autowired
-    private MarketPriceService marketPriceService;
+    private final MarketPriceService marketPriceService;
 
-    @Operation(summary = "Add new market price (Admin only)")
+    @Operation(summary = "Add new market price - Admin only")
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MarketPrice> addPrice(@RequestBody MarketPrice price) {
@@ -45,14 +44,14 @@ public class MarketPriceController {
         return ResponseEntity.ok(marketPriceService.getPriceByCrop(cropName));
     }
 
-    @Operation(summary = "Update market price by ID (Admin only)")
+    @Operation(summary = "Update market price - Admin only")
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MarketPrice> updatePrice(@PathVariable Long id, @RequestBody MarketPrice price) {
         return ResponseEntity.ok(marketPriceService.updatedPrice(id, price));
     }
 
-    @Operation(summary = "Delete market price by ID (Admin only)")
+    @Operation(summary = "Delete market price - Admin only")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deletePrice(@PathVariable Long id) {

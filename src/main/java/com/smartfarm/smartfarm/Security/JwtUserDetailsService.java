@@ -1,6 +1,5 @@
 package com.smartfarm.smartfarm.Security;
 
-
 import com.smartfarm.smartfarm.repositories.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.*;
@@ -18,9 +17,8 @@ public class JwtUserDetailsService implements UserDetailsService {
                 .map(user -> org.springframework.security.core.userdetails.User.builder()
                         .username(user.getEmail())
                         .password(user.getPassword())
-//                        .roles(user.getRole().name()) // Must be FARMER or ADMIN
+                        .roles(user.getRole().name())
                         .build())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
     }
 }
-

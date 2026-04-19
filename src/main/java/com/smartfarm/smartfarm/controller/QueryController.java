@@ -6,46 +6,44 @@ import com.smartfarm.smartfarm.service.QueryService;
 import com.smartfarm.smartfarm.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Queries", description = "Farmers can ask questions; Admins can view and manage all queries.")
+@Tag(name = "Queries", description = "Farmers ask questions; Admins manage all queries")
 @RestController
 @RequestMapping("/api/queries")
+@RequiredArgsConstructor
 public class QueryController {
 
-    @Autowired
-    private QueryService queryService;
+    private final QueryService queryService;
+    private final UserService userService;
 
-    @Autowired
-    private UserService userService;
-
-    @Operation(summary = "Submit a new query (Farmer only)")
+    @Operation(summary = "Submit a new query - Farmer only")
     @PostMapping
     @PreAuthorize("hasRole('FARMER')")
     public ResponseEntity<Query> submitQuery(@RequestBody Query query) {
         return ResponseEntity.ok(queryService.submitQuery(query));
     }
 
-    @Operation(summary = "Get all queries (Admin only)")
+    @Operation(summary = "Get all queries - Admin only")
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Query>> getAllQueries() {
         return ResponseEntity.ok(queryService.getAllQueries());
     }
 
-    @Operation(summary = "Get query by ID (Admin only)")
+    @Operation(summary = "Get query by ID - Admin only")
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Query> getQueryById(@PathVariable Long id) {
         return ResponseEntity.ok(queryService.getQueryById(id));
     }
 
-    @Operation(summary = "Get all queries submitted by a specific user (Admin only)")
+    @Operation(summary = "Get queries by user - Admin only")
     @GetMapping("/user/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Query>> getQueriesByUser(@PathVariable Long userId) {
@@ -54,14 +52,14 @@ public class QueryController {
         return ResponseEntity.ok(queryService.getQueriesByUser(user));
     }
 
-    @Operation(summary = "Update a query (Admin only)")
+    @Operation(summary = "Update a query - Admin only")
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Query> updateQuery(@PathVariable Long id, @RequestBody Query query) {
         return ResponseEntity.ok(queryService.updateQuery(id, query));
     }
 
-    @Operation(summary = "Delete a query (Admin only)")
+    @Operation(summary = "Delete a query - Admin only")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteQuery(@PathVariable Long id) {

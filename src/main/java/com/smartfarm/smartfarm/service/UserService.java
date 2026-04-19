@@ -2,17 +2,17 @@ package com.smartfarm.smartfarm.service;
 
 import com.smartfarm.smartfarm.entity.User;
 import com.smartfarm.smartfarm.repositories.UserRepo;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepo userRepo;
+    private final UserRepo userRepo;
 
     public User registerUser(User user) {
         return userRepo.save(user);
@@ -23,7 +23,6 @@ public class UserService {
     }
 
     public Optional<User> getUserByEmail(String email) {
-
         return userRepo.findByEmail(email);
     }
 
@@ -32,18 +31,17 @@ public class UserService {
     }
 
     public User updateUser(Long id, User updatedUser) {
-        User user = userRepo.findById(id).orElseThrow(() -> new RuntimeException("User not found "));
+        User user = userRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
         user.setName(updatedUser.getName());
         user.setEmail(updatedUser.getEmail());
-//        user.setRole(updatedUser.getRole());
-//        user.setPassword(updatedUser.getPassword());
-//        user.setLocation(updatedUser.getLocation());
-//        user.setSoilType(updatedUser.getSoilType());
         return userRepo.save(user);
     }
 
     public void deleteUser(Long id) {
+        if (!userRepo.existsById(id)) {
+            throw new RuntimeException("User not found with id: " + id);
+        }
         userRepo.deleteById(id);
     }
-
 }

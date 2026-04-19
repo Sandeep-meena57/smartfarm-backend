@@ -17,25 +17,22 @@ public class SmartfarmApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SmartfarmApplication.class, args);
 	}
-//
-//	@Bean
-//	public CommandLineRunner createAdmin(UserRepo userRepo, PasswordEncoder passwordEncoder) {
-//		return args -> {
-//			System.out.println("🔧 CommandLineRunner started...");
-//
-//			if (userRepo.findByEmail("admin@smartfarm.com").isEmpty()) {
-//				User admin = new User();
-//				admin.setName("Admin");
-//				admin.setEmail("admin@smartfarm.com");
-//				admin.setPassword(passwordEncoder.encode("Sandeep@57"));
-//				admin.setRole(Role.ADMIN);
-//				userRepo.save(admin);
-//				System.out.println("✅ Admin user created!");
-//			} else {
-//				System.out.println("ℹ️ Admin already exists");
-//			}
-//		};
-//	}
 
-
+	@Bean
+	public CommandLineRunner createAdmin(UserRepo userRepo, PasswordEncoder passwordEncoder) {
+		return args -> {
+			if (userRepo.findByEmail("admin@smartfarm.com").isEmpty()) {
+				User admin = User.builder()
+						.name("Admin")
+						.email("admin@smartfarm.com")
+						.password(passwordEncoder.encode("Admin@123"))
+						.role(Role.ADMIN)
+						.build();
+				userRepo.save(admin);
+				System.out.println("✅ Admin created: admin@smartfarm.com / Admin@123");
+			} else {
+				System.out.println("ℹ️ Admin already exists");
+			}
+		};
+	}
 }

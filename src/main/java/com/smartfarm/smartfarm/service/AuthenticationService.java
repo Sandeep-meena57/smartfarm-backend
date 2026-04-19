@@ -1,6 +1,5 @@
 package com.smartfarm.smartfarm.service;
 
-
 import com.smartfarm.smartfarm.DTO.AuthResponse;
 import com.smartfarm.smartfarm.DTO.LoginRequest;
 import com.smartfarm.smartfarm.DTO.RegisterRequest;
@@ -24,16 +23,18 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthResponse register(RegisterRequest request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new RuntimeException("Email already registered: " + request.getEmail());
+        }
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                //.role(Role.FARMER)
+                .role(Role.FARMER)
                 .build();
         userRepository.save(user);
-
         String token = jwtService.generateToken(user.getEmail());
-        return new AuthResponse("User Registered Successfully",token,user.getEmail());
+        return new AuthResponse("User Registered Successfully", token, user.getEmail());
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -43,8 +44,9 @@ public class AuthenticationService {
                         request.getPassword()
                 )
         );
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow();
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
         String token = jwtService.generateToken(user.getEmail());
-        return new AuthResponse("User Login Successfully",token,user.getEmail());
+        return new AuthResponse("User Login Successfully", token, user.getEmail());
     }
 }

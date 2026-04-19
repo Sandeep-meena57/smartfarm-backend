@@ -4,22 +4,22 @@ import com.smartfarm.smartfarm.entity.PestAlert;
 import com.smartfarm.smartfarm.service.PestAlertService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Pest Alerts", description = "Manage pest outbreak alerts and notify farmers region-wise")
+@Tag(name = "Pest Alerts", description = "Manage pest outbreak alerts")
 @RestController
 @RequestMapping("/api/alerts")
+@RequiredArgsConstructor
 public class PestAlertController {
 
-    @Autowired
-    private PestAlertService pestAlertService;
+    private final PestAlertService pestAlertService;
 
-    @Operation(summary = "Add a new pest alert (Admin only)")
+    @Operation(summary = "Add a new pest alert - Admin only")
     @PostMapping("/add")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PestAlert> addAlert(@RequestBody PestAlert alert) {
